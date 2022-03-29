@@ -1,0 +1,33 @@
+yarn create nex-app --typescript   en nombre moni-shop
+
+Instalar MaterialUI
+====================
+yarn add @mui/material @emotion/react @emotion/styled
+
+Crear _document.tsx     dentro de pages
+=======================================
+usar snippet nextdocument
+
+
+
+Copiar Fuente Roboto en el Head de _document.tsx
+====================
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+/>
+
+Instalar los SVG icons
+=======================
+yarn add @mui/icons-material
+
+
+Agregar ThemeProvider en _app.tsx
+=================================
+import { CssBaseline, ThemeProvider } from '@mui/material'
+import { lightTheme } from '../themes'
+
+<ThemeProvider theme ={lightTheme}>
+    <CssBaseline/>
+    <Component {...pageProps} />
+</ThemeProvider>
