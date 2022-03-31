@@ -8,7 +8,7 @@ export const Navbar = () => {
   return (
     <AppBar>
         <Toolbar>
-            <NextLink href='' passHref>
+            <NextLink href='/' passHref>
                 <Link display='flex' alignItems='center'>
                     <Typography variant='h6'>Mini |</Typography>
                     <Typography sx={{ marginLeft: 0.5}}>Shop</Typography>
