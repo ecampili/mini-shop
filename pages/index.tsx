@@ -6,11 +6,18 @@ import { Typography } from '@mui/material'
 import { ShopLayout } from '../components/layouts'
 import { ProductList } from '../components/products'
 import { initialData } from '../database/products'
+import { useProducts } from '../hooks'
+import {FullScreenLoading} from '../components/ui'
 
 
 
+const HomePage: NextPage = () => {
 
-const Home: NextPage = () => {
+  const {products, isLoading, isError} = useProducts('/products')  
+
+
+  
+
   return (
  <ShopLayout
   title={'Mini-Shop - Home'} 
@@ -19,11 +26,18 @@ const Home: NextPage = () => {
   >
       <Typography variant= 'h1' component ='h1'>Tienda</Typography>
       <Typography variant= 'h2' sx={{ marginBottom :1}}>Todos los productos</Typography>
+
+    {
+      isLoading 
+      ? <FullScreenLoading/>
+      : <ProductList products={products}/>
+    }
+
      
-      <ProductList products={initialData.products as any}/>
+     
 
  </ShopLayout>
   )
 }
 
-export default Home
+export default HomePage
