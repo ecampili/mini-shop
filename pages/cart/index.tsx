@@ -4,11 +4,15 @@ import { CartList, OrderSummary } from '../../components/cart'
 
 import { ShopLayout } from '../../components/layouts'
 
+
 interface Props{
 
 }
 
 const CartPage:FC<Props> = () => {
+
+
+
   return (
    <ShopLayout title='Carrito -3' pageDescription='carrito de compras de mini shop'>
        <Typography variant='h1' component ='h1'>Carrito</Typography>

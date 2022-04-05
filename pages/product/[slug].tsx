@@ -1,16 +1,19 @@
 import { Box, Button, Chip, Grid, Typography } from '@mui/material';
-import React from 'react'
+import React, { useContext, useState } from 'react'
 import { ShopLayout } from '../../components/layouts/ShopLayout';
 import { ProductSlideShow } from '../../components/products';
 import { ItemCounter } from '../../components/ui';
 import { initialData } from '../../database/products';
 import { SizeSelector } from '../../components/products/SizeSelector';
-import { IProduct } from '../../interfaces';
+import { ICartProduct, IProduct } from '../../interfaces';
 import { NextPage , GetStaticProps, GetStaticPaths} from 'next';
 import { Product } from '../../models';
 import { dbProducts } from '../../database';
-// import { useRouter } from 'next/router';
+import { useRouter } from 'next/router';
 // import { useProducts } from '../../hooks/useProducts';
+import { ISize } from '../../interfaces/products';
+import { UIContext } from '../../context/ui/UIContext';
+import { CartContext } from '../../context/cart/CartContext';
 
 interface Props{
   product:IProduct
@@ -20,12 +23,42 @@ interface Props{
 
 const ProductPage:NextPage<Props> = ({product}) => {
 
-  // const router = useRouter()
-  // const{products:product ,isLoading} = useProducts(`/products/${router.query.slug}`);
+  const router = useRouter()
 
-  // if(isLoading){
-  //   return (<h1>Cragando ....</h1>)
-  // }
+  const {addProductToCart} = useContext(CartContext)
+
+  const [tempCartProduct  , setTempCartProduct  ] = useState<ICartProduct>({
+    _id: product._id,
+    image: product.images[0],
+    price: product.price,
+    size: undefined,
+    slug: product.slug,
+    title: product.title,
+    gender: product.gender,
+    quantity: 1,
+  })
+
+  const selectedSize =(size:ISize)=>{
+   setTempCartProduct(currentProduct =>({...currentProduct,size}))
+  }
+
+  const onUpdateQuantity =(newQuantity:number)=>{
+    setTempCartProduct(currentProduct =>({
+      ...currentProduct,
+      quantity: newQuantity
+    })) 
+  }
+
+
+  const onAddProduct=()=>{
+    if(!tempCartProduct.size) return 
+
+    // llamar la accion del context para agregar al carrito
+    addProductToCart(tempCartProduct)
+    //console.log(tempCartProduct)
+    router.push('/cart')
+  }
+
   
   return (
    <ShopLayout title={product.title} pageDescription={product.description}>
@@ -45,17 +78,42 @@ const ProductPage:NextPage<Props> = ({product}) => {
            <Box sx={{my:2}}>
              <Typography variant='subtitle2'>Cantidad</Typography>
              {/* ItemCouter */}
-              <ItemCounter/>
-              <SizeSelector sizes={product.sizes}              />
+              <ItemCounter 
+                currentValue={ tempCartProduct.quantity}
+                // increase={increase}
+                // decrease={decrease}
+                maxValue={product.inStock > 5 ? 5 :product.inStock}
+                updatedQuantity={onUpdateQuantity}
+                />
+
+
+
+              <SizeSelector 
+              sizes={product.sizes}
+              selectedSize={tempCartProduct.size}
+              onSelectedSize={(size)=>selectedSize(size)}
+              />
            </Box>
 
           
 
            {/* Agregar al carrito */}
 
-           <Button color='secondary' className='circular-btn'>
-             Agregar al carrito
-           </Button>
+            {product.inStock>0 
+              ?(<Button 
+              color='secondary' 
+              className='circular-btn'
+              onClick={onAddProduct}
+              >
+              {
+                tempCartProduct.size? 'Agregar al carrito' :'selecione un talla'
+              }
+              </Button>)
+              :(
+              <Chip label="No hay disponibles" color="error" variant= "outlined"/> 
+              )
+            }
+        
            {/* <Chip label="No hay disponibles" color="error" variant= "outlined"/> */}
 
            {/* Description */}
