@@ -1,15 +1,22 @@
 import { Box, Button, Card, CardContent, Divider, Grid, Link, Typography } from '@mui/material'
-import React, { FC } from 'react'
+import React, { FC, useContext } from 'react'
 import { CartList, OrderSummary } from '../../components/cart'
 import NextLink from 'next/link';
 
 import { ShopLayout } from '../../components/layouts'
+import { CartContext } from '../../context';
+
 
 interface Props{
 
 }
 
 const SummaryPage:FC<Props> = () => {
+
+  const{shippingAddress,numberOfItems}=useContext(CartContext)
+
+
+
   return (
    <ShopLayout title='Resumen de compra' pageDescription='Resumen de la orden'>
        <Typography variant='h1' component ='h1'>Resumen de la orden</Typography>
@@ -21,7 +28,7 @@ const SummaryPage:FC<Props> = () => {
            <Grid item xs={12} sm={5}>
              <Card className='summary-card'>
                <CardContent>
-                 <Typography variant='h2'>Resumen (3 productos)</Typography>
+                 <Typography variant='h2'>Resumen ({numberOfItems} {numberOfItems>1 ?'productos':'producto'})</Typography>
                  <Divider sx={{my:1}}/>
 
                  <Box display='flex' justifyContent='space-between'>
@@ -32,11 +39,12 @@ const SummaryPage:FC<Props> = () => {
                         </Link>
                     </NextLink>
                  </Box>
-                 <Typography >Eduardo Campili</Typography>
-                 <Typography >Algún lugar</Typography>
-                 <Typography >Buenos Aires, cp1234</Typography>
-                 <Typography >Argentina</Typography>
-                 <Typography >+054 1168983242</Typography>
+                 <Typography >{shippingAddress?.firstName} {shippingAddress?.lastName}</Typography>
+                 <Typography >{shippingAddress?.address}</Typography>
+                 <Typography >{shippingAddress?.address2}</Typography>
+                 <Typography >{shippingAddress?.city}, {shippingAddress?.zip}</Typography>
+                 <Typography >{shippingAddress?.country}</Typography>
+                 <Typography >Tel: {shippingAddress?.phone}</Typography>
 
                  <Divider sx={{my:1}}/>
       

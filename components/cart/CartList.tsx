@@ -1,12 +1,12 @@
 import { Box, Button, CardActionArea, CardMedia, Grid, Link, Typography } from '@mui/material';
 import React, { FC, useContext } from 'react'
-import { initialData } from '../../database/products';
+
 import NextLink from 'next/link';
 import { ItemCounter } from '../ui';
 import { CartContext } from '../../context';
 import { ICartProduct } from '../../interfaces';
 
-import {format} from '../../utils'
+import {currency} from '../../utils'
 
 
 

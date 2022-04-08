@@ -1,13 +1,21 @@
 import { Box, Divider, Drawer, IconButton, Input, InputAdornment, List, ListItem, ListItemIcon, ListItemText, ListSubheader } from "@mui/material"
 import { AccountCircleOutlined, AdminPanelSettings, CategoryOutlined, ConfirmationNumberOutlined, EscalatorWarningOutlined, FemaleOutlined, LoginOutlined, MaleOutlined, SearchOutlined, VpnKeyOutlined } from "@mui/icons-material"
 import { useContext, useState } from "react"
-import { UIContext } from "../../context"
+import { AuthContext, UIContext } from "../../context"
 import { useRouter } from "next/router"
+
+import Cookies from 'js-cookie'
+
+
 
 
 export const SideMenu = () => {
 
     const {isMenuOpen,toggleSideMenu} = useContext(UIContext)
+    const {user,isLoggedIn ,logOutUser} = useContext(AuthContext)
+
+    // console.log('user',user)
+    // console.log('isLoggedIn',isLoggedIn)
 
     const [searchTerm, setSearchTerm] = useState('');
 
@@ -20,9 +28,10 @@ export const SideMenu = () => {
 
     const navigateTo =(url:string)=>{
         router.push(url)
-        toggleSideMenu()
-       
+        toggleSideMenu()       
     }
+
+   
 
     
   return (
@@ -57,19 +66,27 @@ export const SideMenu = () => {
                     />
                 </ListItem>
 
-                <ListItem button>
-                    <ListItemIcon>
-                        <AccountCircleOutlined/>
-                    </ListItemIcon>
-                    <ListItemText primary={'Perfil'} />
-                </ListItem>
+                {
+                    isLoggedIn
+                     ?(
+                        <>
+                        <ListItem button >
+                            <ListItemIcon>
+                                <AccountCircleOutlined/>
+                            </ListItemIcon>
+                            <ListItemText primary={'Perfil'} />
+                        </ListItem>
 
-                <ListItem button>
-                    <ListItemIcon>
-                        <ConfirmationNumberOutlined/>
-                    </ListItemIcon>
-                    <ListItemText primary={'Mis Ordenes'} />
-                </ListItem>
+                        <ListItem button>
+                            <ListItemIcon>
+                                <ConfirmationNumberOutlined/>
+                            </ListItemIcon>
+                            <ListItemText primary={'Mis Ordenes'} />
+                        </ListItem>
+                        </>
+                    )
+                    :null
+                }
 
 
                 <ListItem button sx={{ display: { xs: '', sm: 'none' } }} onClick={()=>navigateTo('/category/men')} >
@@ -100,45 +117,59 @@ export const SideMenu = () => {
                     <ListItemText primary={'Unisex'} />
                 </ListItem>
 
+                {
+                    !isLoggedIn 
+                    ?(<ListItem 
+                    button
+                    onClick={()=>navigateTo(`/auth/login?page=${router.asPath}`)}
+                    >
+                        <ListItemIcon>
+                            <VpnKeyOutlined/>
+                        </ListItemIcon>
+                        <ListItemText primary={'Ingresar'} />
+                    </ListItem>)
+                    :(<ListItem button onClick={logOutUser}>
+                        <ListItemIcon>
+                            <LoginOutlined/>
+                        </ListItemIcon>
+                        <ListItemText primary={'Salir'} />
+                    </ListItem>)
+                }
+                
 
-                <ListItem button>
-                    <ListItemIcon>
-                        <VpnKeyOutlined/>
-                    </ListItemIcon>
-                    <ListItemText primary={'Ingresar'} />
-                </ListItem>
+            
 
-                <ListItem button>
-                    <ListItemIcon>
-                        <LoginOutlined/>
-                    </ListItemIcon>
-                    <ListItemText primary={'Salir'} />
-                </ListItem>
+                 {
+                        user && (user.role) === 'admin' && (
+                            <>
+                             {/* Admin */}
+                             <Divider />
+                            <ListSubheader>Admin Panel</ListSubheader>
 
+                            <ListItem button>
+                                <ListItemIcon>
+                                    <CategoryOutlined/>
+                                </ListItemIcon>
+                                <ListItemText primary={'Productos'} />
+                            </ListItem>
+                            <ListItem button>
+                                <ListItemIcon>
+                                    <ConfirmationNumberOutlined/>
+                                </ListItemIcon>
+                                <ListItemText primary={'Ordenes'} />
+                            </ListItem>
 
-                {/* Admin */}
-                <Divider />
-                <ListSubheader>Admin Panel</ListSubheader>
-
-                <ListItem button>
-                    <ListItemIcon>
-                        <CategoryOutlined/>
-                    </ListItemIcon>
-                    <ListItemText primary={'Productos'} />
-                </ListItem>
-                <ListItem button>
-                    <ListItemIcon>
-                        <ConfirmationNumberOutlined/>
-                    </ListItemIcon>
-                    <ListItemText primary={'Ordenes'} />
-                </ListItem>
-
-                <ListItem button>
-                    <ListItemIcon>
-                        <AdminPanelSettings/>
-                    </ListItemIcon>
-                    <ListItemText primary={'Usuarios'} />
-                </ListItem>
+                            <ListItem button>
+                                <ListItemIcon>
+                                    <AdminPanelSettings/>
+                                </ListItemIcon>
+                                <ListItemText primary={'Usuarios'} />
+                            </ListItem>
+                            </>
+                        )
+                     
+                 }       
+               
             </List>
         </Box>
     </Drawer>

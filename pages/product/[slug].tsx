@@ -3,7 +3,7 @@ import React, { useContext, useState } from 'react'
 import { ShopLayout } from '../../components/layouts/ShopLayout';
 import { ProductSlideShow } from '../../components/products';
 import { ItemCounter } from '../../components/ui';
-import { initialData } from '../../database/products';
+import { initialData } from '../../database/seed-data.ts';
 import { SizeSelector } from '../../components/products/SizeSelector';
 import { ICartProduct, IProduct } from '../../interfaces';
 import { NextPage , GetStaticProps, GetStaticPaths} from 'next';
