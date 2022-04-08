@@ -20,7 +20,7 @@ const LoginPage = () => {
 
     const router = useRouter()
 
-    console.log('router',router)
+    // console.log('router',router)
 
     const { loginUser} = useContext(AuthContext)
   
