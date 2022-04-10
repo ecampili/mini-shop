@@ -1,14 +1,19 @@
-import { Box, Button, Grid, Link, TextField, Typography,Chip } from '@mui/material'
 import React, { useContext, useState } from 'react'
-import { AuthLayout } from '../../components/layouts'
-import NextLink from 'next/link';
-import { validations } from '../../utils';
-import { useForm } from 'react-hook-form';
-import Cookie from 'js-cookie';
-import { miniShopApi } from '../../api';
-import { ErrorOutline } from '@mui/icons-material';
-import { AuthContext } from '../../context';
 import { useRouter } from 'next/router';
+import { GetServerSideProps } from 'next'
+import NextLink from 'next/link';
+import { getSession, signIn } from 'next-auth/react';
+import { useForm } from 'react-hook-form';
+
+//import Cookie from 'js-cookie';
+
+import { Box, Button, Grid, Link, TextField, Typography,Chip } from '@mui/material'
+import { ErrorOutline } from '@mui/icons-material';
+
+import { AuthLayout } from '../../components/layouts'
+import { validations } from '../../utils';
+//import { miniShopApi } from '../../api';
+import { AuthContext } from '../../context';
 
 type FormData ={
     name:string;
@@ -30,7 +35,6 @@ const RegisterPage = () => {
         // console.log({name,email,password})
 
         setShowError(false)
-
         const {hasError,message} = await registerUser(name,email,password)
 
         if(hasError){          
@@ -42,9 +46,9 @@ const RegisterPage = () => {
             return
         }
 
-        const destination = router.query.page?.toLocaleString() || '/'
-
-        router.replace(destination)
+        // const destination = router.query.page?.toLocaleString() || '/'
+        // router.replace(destination)
+        await signIn('credentials',{email,password});
 
         // try {
         //     const {data} = await miniShopApi.post('/user/register',{name, email,password})
@@ -60,7 +64,7 @@ const RegisterPage = () => {
         // }
     }
 
-    console.log('router en el register',router)
+    //console.log('router en el register',router)
 
   return (
    <AuthLayout title='Ingresar'> 
@@ -136,6 +140,32 @@ const RegisterPage = () => {
 
    </AuthLayout>
   )
+}
+
+
+// You should use getServerSideProps when:
+// - Only if you need to pre-render a page whose data must be fetched at request time
+
+
+export const getServerSideProps: GetServerSideProps = async ({req,query}) => {
+   
+    const session = await getSession({req})
+    
+    const {page='/'} =query; 
+    if(session){
+        return{
+            redirect:{
+                destination:page.toString(),
+                permanent:false
+            }
+        }
+    }
+
+    return {
+        props: {
+            
+        }
+    }
 }
 
 export default RegisterPage

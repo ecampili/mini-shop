@@ -61,7 +61,7 @@ const ProductPage:NextPage<Props> = ({product}) => {
 
   
   return (
-   <ShopLayout title={product.title} pageDescription={product.description}>
+   <ShopLayout title={product.title} pageDescription={product.description} imageFullUrl={product.images[0]}>
      <Grid container spacing={3}>
        <Grid item xs={12} sm={7}>
          {/* slideShow */}
@@ -193,7 +193,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     props: {
       product
     },
-    revalidate: 60 * 60 * 24
+    revalidate: 60 * 60 * 24 //1 dia
   }
 }
 

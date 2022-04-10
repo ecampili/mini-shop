@@ -1,73 +1,92 @@
-import { Box, Button, Card, CardContent, Divider, Grid, Link, Typography } from '@mui/material'
-import React, { FC, useContext } from 'react'
-import { CartList, OrderSummary } from '../../components/cart'
+import { useContext, useEffect } from 'react';
 import NextLink from 'next/link';
+import { useRouter } from 'next/router';
+import Cookies from 'js-cookie';
 
-import { ShopLayout } from '../../components/layouts'
+import { Link, Box, Button, Card, CardContent, Divider, Grid, Typography } from '@mui/material';
+
 import { CartContext } from '../../context';
+import { ShopLayout } from '../../components/layouts/ShopLayout';
+import { CartList, OrderSummary } from '../../components/cart';
+import { countries } from '../../utils';
 
 
-interface Props{
+const SummaryPage = () => {
 
-}
+    const router = useRouter();
+    const { shippingAddress, numberOfItems } = useContext( CartContext );
+    
+    useEffect(() => {
+        if ( !Cookies.get('firstName') ) {
+            router.push('/checkout/address');
+        }
+    }, [ router ]);
+    
 
-const SummaryPage:FC<Props> = () => {
 
-  const{shippingAddress,numberOfItems}=useContext(CartContext)
+    if ( !shippingAddress ) {
+        return <></>;
+    }
 
-
+    const { firstName, lastName, address, address2 = '', city, country, phone, zip } = shippingAddress;
 
   return (
-   <ShopLayout title='Resumen de compra' pageDescription='Resumen de la orden'>
-       <Typography variant='h1' component ='h1'>Resumen de la orden</Typography>
-       <Grid container sx={{mt:5}}>
-           <Grid item xs={12} sm={7}>
-            {/* cartList */}
-          <CartList />
-           </Grid>
-           <Grid item xs={12} sm={5}>
-             <Card className='summary-card'>
-               <CardContent>
-                 <Typography variant='h2'>Resumen ({numberOfItems} {numberOfItems>1 ?'productos':'producto'})</Typography>
-                 <Divider sx={{my:1}}/>
+    <ShopLayout title='Resumen de orden' pageDescription={'Resumen de la orden'}>
+        <Typography variant='h1' component='h1'>Resumen de la orden</Typography>
 
-                 <Box display='flex' justifyContent='space-between'>
-                 <Typography variant='subtitle1'>Dirección de entrega</Typography>
-                    <NextLink href='/checkout/address' passHref>
-                        <Link underline='always' color='secondary'>
-                            Editar
-                        </Link>
-                    </NextLink>
-                 </Box>
-                 <Typography >{shippingAddress?.firstName} {shippingAddress?.lastName}</Typography>
-                 <Typography >{shippingAddress?.address}</Typography>
-                 <Typography >{shippingAddress?.address2}</Typography>
-                 <Typography >{shippingAddress?.city}, {shippingAddress?.zip}</Typography>
-                 <Typography >{shippingAddress?.country}</Typography>
-                 <Typography >Tel: {shippingAddress?.phone}</Typography>
-
-                 <Divider sx={{my:1}}/>
-      
-                 <Box display='flex' justifyContent='end'>
-                    <NextLink href='/cart' passHref>
-                        <Link underline='always' color='secondary'>
-                            Editar
-                        </Link>
-                    </NextLink>
-                 </Box>
-                 <OrderSummary/>
-
-                 <Box sx={{mt:3}}>
-                  <Button color='secondary' className='circular-btn' fullWidth>Confirmar Orden</Button>
-                 </Box>
-
-               </CardContent>
-             </Card>
-              
+        <Grid container>
+            <Grid item xs={ 12 } sm={ 7 }>
+                <CartList />
             </Grid>
-       </Grid>
-   </ShopLayout>
+            <Grid item xs={ 12 } sm={ 5 }>
+                <Card className='summary-card'>
+                    <CardContent>
+                        <Typography variant='h2'>Resumen ({numberOfItems} { numberOfItems === 1 ? 'producto':'productos' })</Typography>
+                        <Divider sx={{ my:1 }} />
+
+                        <Box display='flex' justifyContent='space-between'>
+                            <Typography variant='subtitle1'>Dirección de entrega</Typography>
+                            <NextLink href='/checkout/address' passHref>
+                                <Link underline='always'>
+                                    Editar
+                                </Link>
+                            </NextLink>
+                        </Box>
+
+                        
+                        <Typography>{ firstName } { lastName }</Typography>
+                        <Typography>{ address }{ address2 ? `, ${address2}` : ''  } </Typography>
+                        <Typography>{ city }, { zip }</Typography>
+                        {/* <Typography>{ countries.find( c => c.code === country )?.name }</Typography> */}
+                        <Typography>{ country }</Typography>
+                        <Typography>{ phone }</Typography>
+
+                        <Divider sx={{ my:1 }} />
+
+                        <Box display='flex' justifyContent='end'>
+                            <NextLink href='/cart' passHref>
+                                <Link underline='always'>
+                                    Editar
+                                </Link>
+                            </NextLink>
+                        </Box>
+
+                        <OrderSummary />
+
+                        <Box sx={{ mt: 3 }}>
+                            <Button color="secondary" className='circular-btn' fullWidth>
+                                Confirmar Orden
+                            </Button>
+                        </Box>
+
+                    </CardContent>
+                </Card>
+            </Grid>
+        </Grid>
+
+
+    </ShopLayout>
   )
 }
 
-export default SummaryPage
+export default SummaryPage;
