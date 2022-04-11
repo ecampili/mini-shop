@@ -17,6 +17,7 @@ type CartActionType =
   }
   |{type:'[Cart]-LoadAddressFromCookies',payload:ShippingAddress}
   |{type:'[Cart]-UpdateAddress',payload:ShippingAddress}
+  | {type : '[Cart]-OrderCompleted'}
 
 export const cartReducer =(state:CartState,action:CartActionType):CartState=>{
   switch(action.type){
@@ -71,8 +72,18 @@ export const cartReducer =(state:CartState,action:CartActionType):CartState=>{
         ...state,
         shippingAddress:action.payload
       }
+
+      case  '[Cart]-OrderCompleted':
+        return{
+          ...state,
+          cart:[],
+          numberOfItems:0,
+          subTotal:0,
+          tax:0,
+          total:0   
+        }
+  
     
-     
     
 
     default: return state

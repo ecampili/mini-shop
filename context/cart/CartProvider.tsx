@@ -1,7 +1,9 @@
 import { FC, useEffect, useReducer } from 'react';
-import { ICartProduct } from '../../interfaces';
+import { ICartProduct, IOrder, ShippingAddress } from '../../interfaces';
 import { CartContext, cartReducer } from './';
 import Cookie from 'js-cookie'
+import miniShopApi from '../../api/miniShopApi';
+import axios from 'axios';
 
 
 export interface CartState {
@@ -15,16 +17,16 @@ export interface CartState {
   shippingAddress?:ShippingAddress;
 }
 
-export interface ShippingAddress{
-  firstName:string;
-  lastName:string;
-  address:string;
-  address2?:string
-  zip:string;
-  city:string;
-  country:string;
-  phone:string;
-}
+// export interface ShippingAddress{
+//   firstName:string;
+//   lastName:string;
+//   address:string;
+//   address2?:string
+//   zip:string;
+//   city:string;
+//   country:string;
+//   phone:string;
+// }
 
 const Cart_INITIAL_STATE: CartState = {
   isLoaded:false,
@@ -145,18 +147,68 @@ useEffect(() => {
     dispatch({ type: '[Cart]-UpdateAddress', payload: address });
 }
 
+const createOrder =async ():Promise<{hasError:boolean; message:string}>=>{
+
+  
+
+  if(!state.shippingAddress){
+    throw new Error('no hay direccion de entrega');
+  }
+
+  const body: IOrder = {
+    orderItems: state.cart.map( p => ({
+        ...p,
+        size: p.size!
+    })),
+    shippingAddress: state.shippingAddress,
+    numberOfItems: state.numberOfItems,
+    subTotal: state.subTotal,
+    tax: state.tax,
+    total: state.total,
+    isPaid: false
+}
+
+  try {
+    const {data} = await miniShopApi.post<IOrder>('/orders',body)
+  
+    // Dispatch para limpiar carrito
+    dispatch({type:'[Cart]-OrderCompleted'})
+    
+    return {
+      hasError:false,
+      message:data._id!
+    }
+    
+    
+
+  } catch (error) {
+    if(axios.isAxiosError(error)){
+      return{
+        hasError:true,
+        message: error.response?.data.message
+      }
+    }
+    return{
+      hasError:true,
+      message:'Error de sistema'
+    }
+  }
+}
+
   
   return (
     <CartContext.Provider
       value={{
-        ...state,
-        
+        ...state,        
 
         //methods
         addProductToCart,
         updateCartQuantity,
         removeProductFromCart,
-        updateAddress
+        updateAddress,
+        createOrder
+        
+
       }}
     >
       {children}

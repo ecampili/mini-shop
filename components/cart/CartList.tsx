@@ -4,7 +4,7 @@ import React, { FC, useContext } from 'react'
 import NextLink from 'next/link';
 import { ItemCounter } from '../ui';
 import { CartContext } from '../../context';
-import { ICartProduct } from '../../interfaces';
+import { ICartProduct, IOrderItem } from '../../interfaces';
 
 import {currency} from '../../utils'
 
@@ -13,10 +13,11 @@ import {currency} from '../../utils'
 
 interface Props{
     editable?:boolean
+    products:IOrderItem[];
 }
 
 
-export const CartList:FC<Props> = ({editable=false}) => {
+export const CartList:FC<Props> = ({editable=false,products}) => {
 
 const {cart,updateCartQuantity,removeProductFromCart} = useContext(CartContext)
 
@@ -25,10 +26,12 @@ const onNewCartQuantity =(product:ICartProduct,newQuantityValue:number)=>{
     updateCartQuantity(product)
 }
 
+const productsToShow =products ? products : cart
+
   return (
     <>
         {
-            cart.map(product =>(
+            productsToShow.map(product =>(
                 <Grid container  spacing={2} sx={{mb:1}} key={product.slug+product.size}>
                     <Grid item xs={3}>
                         {/* TODO:llevar a la pagina del producto */}
@@ -56,7 +59,7 @@ const onNewCartQuantity =(product:ICartProduct,newQuantityValue:number)=>{
                                 ?<ItemCounter 
                                     currentValue={product.quantity} 
                                     maxValue={5} 
-                                    updatedQuantity={(value)=>{onNewCartQuantity(product,value)}}/>
+                                    updatedQuantity={(value)=>{onNewCartQuantity(product as ICartProduct,value)}}/>
                                 :<Typography variant='h6'>{product.quantity} {product.quantity >1 ? 'Productos' : 'Producto'}</Typography>
                             }
 
@@ -70,7 +73,7 @@ const onNewCartQuantity =(product:ICartProduct,newQuantityValue:number)=>{
 
                         {
                             editable && (<Button variant='text' color='secondary'
-                                onClick={()=>removeProductFromCart(product)}
+                                onClick={()=>removeProductFromCart(product as ICartProduct)}
                             >
                                          Remover
                                          </Button>
